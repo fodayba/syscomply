@@ -22,5 +22,5 @@ Copy `.env.example` to `.env` to point at a different API or app URL.
 
 - **SPA fallback:** the host must rewrite unknown paths to `index.html` so routes like `/pricing` load directly.
 - **CORS:** the pricing page fetches `/organizations/plan-catalog` and `/exchange-rate`, and the forms post to `/support/demo-request` and `/support/public/contact`. The API currently doesn't send CORS headers for other origins, so those calls fail from `localhost`. Pricing falls back to the built-in prices, and the forms show an error. The API needs to allow the new site's origin.
-- **Logo:** `src/components/Logo.tsx` holds the wordmark and the "S." monogram. `public/favicon.svg` and `public/apple-touch-icon.png` are generated from the same monogram. The dashboard screenshots in `src/assets/` still show the old logo.
+- **Logo:** the Loop mark lives in `src/components/Logo.tsx`. `public/favicon.svg` and `public/apple-touch-icon.png` use the same geometry on an ink tile. The concept rounds are in `content/logo-concepts/`. The dashboard screenshots in `src/assets/` still show the old logo.
 # syscomply
