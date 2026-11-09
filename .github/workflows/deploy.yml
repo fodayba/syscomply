@@ -1,0 +1,71 @@
+name: Deploy to Firebase Hosting
+
+# Every push to main is linted, built and deployed to the live site.
+# Pull requests are linted and built only.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deploy at a time; a newer push cancels a run that is still in progress.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # lets GitHub issue the OIDC token Google exchanges for access
+    environment:
+      name: production
+      url: https://sys-comply.web.app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      # Keyless auth (Workload Identity Federation). No secret is stored in GitHub:
+      # Google only trusts tokens from this repository's main branch.
+      # These identifiers are not sensitive.
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/1088145845638/locations/global/workloadIdentityPools/github/providers/syscomply
+          service_account: github-deployer@sys-comply.iam.gserviceaccount.com
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - run: npx --yes firebase-tools@14 deploy --only hosting --project sys-comply --non-interactive
