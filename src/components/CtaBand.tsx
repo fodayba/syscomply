@@ -15,7 +15,7 @@ export function CtaBand({
 }) {
   const openDemo = useOpenDemo()
   return (
-    <section className="bg-ink pt-24 pb-20 text-paper md:pt-32 md:pb-24">
+    <section className="bg-ink pt-20 pb-16 text-paper md:pt-32 md:pb-24">
       <Container>
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-display text-[2.25rem] leading-[1.08] font-normal tracking-[-0.02em] text-balance md:text-[3.5rem]">{title}</h2>

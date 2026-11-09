@@ -9,7 +9,7 @@ type Variant = 'primary' | 'light' | 'outline' | 'outline-light'
 type Size = 'md' | 'lg'
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-full font-medium tracking-[-0.01em] whitespace-nowrap transition-colors duration-200 disabled:pointer-events-none disabled:opacity-50'
+  'inline-flex items-center justify-center gap-2 rounded-full font-medium tracking-[-0.01em] whitespace-nowrap transition-[color,background-color,border-color,scale] duration-200 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50'
 
 const variants: Record<Variant, string> = {
   primary: 'bg-ink text-paper hover:bg-ink-3',
@@ -19,7 +19,7 @@ const variants: Record<Variant, string> = {
 }
 
 const sizes: Record<Size, string> = {
-  md: 'h-10 px-5 text-sm',
+  md: 'h-11 px-5 text-sm',
   lg: 'h-12 px-6 text-[15px]',
 }
 
@@ -47,7 +47,7 @@ export function ButtonA({ variant, size, className = '', ...props }: ComponentPr
 export function TextLink({ light, className = '', children, ...props }: ComponentProps<typeof Link> & { light?: boolean }) {
   return (
     <Link
-      className={`group inline-flex items-center gap-1.5 text-[15px] font-medium ${light ? 'text-paper' : 'text-ink'} ${className}`}
+      className={`group -my-2.5 inline-flex min-h-11 items-center gap-1.5 py-2.5 text-[15px] font-medium ${light ? 'text-paper' : 'text-ink'} ${className}`}
       {...props}
     >
       <span className="border-b border-current/25 pb-0.5 transition-colors group-hover:border-current">{children}</span>
@@ -91,7 +91,7 @@ export function Section({
   afterHeader?: boolean
   'aria-label'?: string
 }) {
-  const pad = afterHeader ? 'pt-14 pb-24 md:pt-20 md:pb-32' : 'py-24 md:py-32'
+  const pad = afterHeader ? 'pt-12 pb-20 md:pt-20 md:pb-32' : 'py-20 md:py-32'
   const reveal = useReveal<HTMLDivElement>()
   return (
     <section id={id} aria-label={ariaLabel} className={`scroll-mt-16 ${pad} ${tones[tone]} ${className}`}>
@@ -103,7 +103,7 @@ export function Section({
 }
 
 /** Space between a section heading and its content. */
-export const stack = 'mt-14 md:mt-20'
+export const stack = 'mt-12 md:mt-20'
 
 /* ------------------------------------------------------------- Typography */
 
@@ -158,15 +158,15 @@ export function PageHeader({
   children?: ReactNode
 }) {
   return (
-    <header className="pt-20 pb-6 md:pt-32 md:pb-10">
+    <header className="pt-14 pb-4 md:pt-32 md:pb-10">
       <Container>
         <div className="max-w-3xl animate-rise">
           <Eyebrow>{eyebrow}</Eyebrow>
-          <h1 className="mt-8 font-display text-[2.75rem] leading-[1.04] font-normal tracking-[-0.025em] text-balance md:text-[4.75rem]">
+          <h1 className="mt-6 font-display text-[2.6rem] leading-[1.04] font-normal tracking-[-0.025em] text-balance md:mt-8 md:text-[4.75rem]">
             {title}
           </h1>
-          {lead && <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted text-pretty md:text-xl">{lead}</p>}
-          {children && <div className="mt-10 flex flex-wrap gap-3">{children}</div>}
+          {lead && <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted text-pretty md:mt-8 md:text-xl">{lead}</p>}
+          {children && <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap md:mt-10">{children}</div>}
         </div>
       </Container>
     </header>
@@ -174,6 +174,38 @@ export function PageHeader({
 }
 
 /* ---------------------------------------------------------------- Pieces */
+
+/**
+ * A grid on tablet and desktop; on phones, a horizontal row you swipe through, with
+ * the next card peeking in so it's obvious there's more. Children are the cards.
+ */
+export function Rail({
+  children,
+  cols = 'md:grid-cols-2 lg:grid-cols-3',
+  item = 'w-[84%]',
+  className = '',
+  label,
+}: {
+  children: ReactNode[]
+  cols?: string
+  item?: string
+  className?: string
+  label: string
+}) {
+  return (
+    <ul
+      data-stagger
+      aria-label={label}
+      className={`-mx-6 flex snap-x snap-mandatory scroll-px-6 gap-3 overflow-x-auto overscroll-x-contain px-6 pb-1 [scrollbar-width:none] md:mx-0 md:grid md:snap-none md:gap-6 md:overflow-visible md:px-0 md:pb-0 [&::-webkit-scrollbar]:hidden ${cols} ${className}`}
+    >
+      {children.map((c, i) => (
+        <li key={i} className={`flex shrink-0 snap-start md:w-auto [&>*]:w-full ${item}`}>
+          {c}
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 /** Icon in a hairline circle. One size, one stroke weight everywhere. */
 export function IconBadge({ icon: Icon, light }: { icon: LucideIcon; light?: boolean }) {

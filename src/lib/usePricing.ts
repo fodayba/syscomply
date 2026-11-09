@@ -12,12 +12,27 @@ const SLE_MARKUP = 0.75
 
 const PREFERRED = ['USD', 'SLE', 'EUR', 'GBP', 'NGN', 'ZAR']
 
+// Fixed names for the currencies we show by default. Intl data differs between runtimes
+// (Chrome has no name for SLE; Node does), and these must match in prerendered HTML.
+const NAMES: Record<string, string> = {
+  USD: 'US Dollar',
+  SLE: 'Sierra Leonean Leone',
+  EUR: 'Euro',
+  GBP: 'British Pound',
+  NGN: 'Nigerian Naira',
+  ZAR: 'South African Rand',
+}
+
 function currencyLabel(code: string) {
-  try {
-    return `${new Intl.DisplayNames(['en'], { type: 'currency' }).of(code)} (${code})`
-  } catch {
-    return code
+  let name = NAMES[code]
+  if (!name) {
+    try {
+      name = new Intl.DisplayNames(['en'], { type: 'currency' }).of(code) ?? code
+    } catch {
+      name = code
+    }
   }
+  return name === code ? code : `${name} (${code})`
 }
 
 /**

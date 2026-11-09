@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { ArrowUpRight, Minus } from 'lucide-react'
 import dashboardDark from '../assets/dashboard-dark.webp'
 import dashboardDarkSm from '../assets/dashboard-dark-960.webp'
-import { useTabs } from '../components/Tabs'
+import { chip, chipRow, useTabs } from '../components/Tabs'
 import { Journey } from '../components/Journey'
 import { CtaBand } from '../components/CtaBand'
 import { useOpenDemo } from '../components/demo-context'
@@ -12,6 +12,7 @@ import {
   ButtonA,
   Container,
   IconBadge,
+  Rail,
   Section,
   SectionHeading,
   TextLink,
@@ -95,7 +96,7 @@ function StatusChip({ label, value, className }: { label: string; value: string;
     >
       <span className="size-1.5 rounded-full bg-sage" aria-hidden="true" />
       <span>
-        <span className="block text-[11px] tracking-[0.12em] text-paper/45 uppercase">{label}</span>
+        <span className="block text-xs tracking-[0.12em] text-paper/55 uppercase">{label}</span>
         <span className="mt-0.5 block text-sm text-paper">{value}</span>
       </span>
     </div>
@@ -208,7 +209,7 @@ function PlatformPreview() {
         <div
           role="tablist"
           aria-label="Platform domains"
-          className="-mx-6 flex gap-2 overflow-x-auto px-6 pb-1 [scrollbar-width:none] lg:mx-0 lg:grid lg:gap-1 lg:overflow-visible lg:px-0 lg:pb-0"
+          className={chipRow}
         >
           {domains.map((x, i) => {
             const on = x.id === active
@@ -216,7 +217,7 @@ function PlatformPreview() {
               <button
                 key={x.id}
                 {...tabProps(x.id, i)}
-                className={`shrink-0 rounded-full px-4 py-2.5 text-sm whitespace-nowrap transition-colors duration-300 lg:rounded-2xl lg:px-5 lg:py-3.5 lg:text-left lg:text-[15px] ${
+                className={`${chip} transition-colors duration-300 lg:text-left ${
                   on ? 'bg-ink text-paper' : 'bg-stone text-muted hover:text-ink lg:bg-transparent lg:hover:bg-stone'
                 }`}
               >
@@ -226,7 +227,7 @@ function PlatformPreview() {
           })}
         </div>
 
-        <div {...panelProps(active)} className="rounded-3xl bg-stone p-8 outline-none md:p-12">
+        <div {...panelProps(active)} className="rounded-3xl bg-stone p-7 outline-none md:p-12">
           <div key={active} className="animate-rise">
             <div className="flex items-start justify-between gap-6">
               <div>
@@ -279,17 +280,17 @@ function IndustriesPreview() {
           All solutions
         </TextLink>
       </div>
-      <ul data-stagger className={`${stack} grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3`}>
+      <Rail label="Industries" className={stack}>
         {industries.map((i) => (
-          <li key={i.id}>
             <Link
+              key={i.id}
               to={`/solutions/${i.id}`}
               className="group flex h-full flex-col rounded-3xl bg-ink-2 p-8 transition-colors duration-300 hover:bg-ink-3"
             >
               <span className="flex items-center justify-between">
                 <IconBadge icon={i.icon} light />
                 <ArrowUpRight
-                  className="size-5 text-paper/30 transition-colors group-hover:text-paper"
+                  className="size-5 text-paper/55 transition-colors group-hover:text-paper"
                   strokeWidth={1.5}
                   aria-hidden="true"
                 />
@@ -297,9 +298,8 @@ function IndustriesPreview() {
               <h3 className="mt-10 font-display text-2xl tracking-[-0.01em]">{i.title}</h3>
               <p className="mt-3 leading-relaxed text-paper/55">{i.short}</p>
             </Link>
-          </li>
         ))}
-      </ul>
+      </Rail>
     </Section>
   )
 }

@@ -22,16 +22,16 @@ export function Solution() {
       <title>{`${industry.title} — SysComply`}</title>
       <header className="pt-10 md:pt-14">
         <Container>
-          <Link to="/solutions" className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-ink">
+          <Link to="/solutions" className="-my-3 inline-flex min-h-11 items-center gap-2 text-sm text-muted transition-colors hover:text-ink">
             <ArrowLeft className="size-4" strokeWidth={1.5} /> All solutions
           </Link>
-          <div className="mt-16 grid gap-12 md:mt-24 lg:grid-cols-[2fr_1fr] lg:items-end lg:gap-20">
+          <div className="mt-10 grid gap-10 md:mt-24 lg:grid-cols-[2fr_1fr] lg:items-end lg:gap-20">
             <div className="animate-rise">
               <Eyebrow>{industry.title}</Eyebrow>
-              <h1 className="mt-8 font-display text-[2.5rem] leading-[1.06] font-normal tracking-[-0.025em] text-balance md:text-[4rem]">
+              <h1 className="mt-6 font-display text-[2.4rem] md:mt-8 leading-[1.06] font-normal tracking-[-0.025em] text-balance md:text-[4rem]">
                 {industry.short}
               </h1>
-              <div className="mt-10 flex flex-wrap gap-3">
+              <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap md:mt-10">
                 <ButtonA href={SIGNUP_URL} size="lg">
                   Get started
                 </ButtonA>
@@ -42,7 +42,7 @@ export function Solution() {
             </div>
             <div className="rounded-3xl bg-ink p-8 text-paper">
               <IconBadge icon={industry.icon} light />
-              <p className="mt-12 text-xs font-medium tracking-[0.16em] text-paper/45 uppercase">Standards covered</p>
+              <p className="mt-12 text-xs font-medium tracking-[0.16em] text-paper/55 uppercase">Standards covered</p>
               <p className="mt-3 font-display text-2xl">{industry.standards.join(', ')}</p>
             </div>
           </div>

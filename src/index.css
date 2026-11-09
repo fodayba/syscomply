@@ -20,7 +20,7 @@
   --color-paper: #f7f6f2;
   --color-stone: #efede7;
   --color-stone-2: #e8e5dd;
-  --color-muted: #6c6f6a;
+  --color-muted: #5e615c; /* ≥ 4.99:1 on paper, stone and stone-2 */
   --color-line: #e2dfd7;
 
   --color-sage: #9db8a6; /* on dark */
@@ -30,9 +30,11 @@
 
   --animate-rise: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 
+  /* Starts at 0.01 rather than 0: visually identical, but browsers count the text as
+     painted immediately, so the entrance doesn't delay Largest Contentful Paint. */
   @keyframes rise {
     from {
-      opacity: 0;
+      opacity: 0.01;
       transform: translateY(8px);
     }
     to {
@@ -51,6 +53,22 @@
   body {
     @apply bg-paper font-sans text-ink;
     font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+  }
+  a,
+  button,
+  [role='tab'],
+  summary {
+    touch-action: manipulation;
+  }
+  /* iOS zooms into any field whose text is under 16px; keep fields at 16px on touch screens. */
+  @media (pointer: coarse) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
   }
   h1,
   h2,
@@ -88,10 +106,14 @@
 
 /* ------------------------------------------------------------------ Motion */
 
-/* Scroll reveal: sections fade up once; [data-stagger] children follow in sequence. */
+/*
+ * Scroll reveal: sections fade up once; [data-stagger] children follow in sequence.
+ * Only sections that start below the fold are ever hidden (JS adds .is-pending), so the
+ * prerendered page is fully visible before any script runs.
+ */
 @media (prefers-reduced-motion: no-preference) {
-  [data-reveal],
-  [data-reveal] [data-stagger] > * {
+  [data-reveal].is-pending,
+  [data-reveal].is-pending [data-stagger] > * {
     opacity: 0;
     translate: 0 14px;
     transition:

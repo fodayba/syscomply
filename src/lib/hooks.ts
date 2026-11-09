@@ -22,10 +22,9 @@ export function useReducedMotion() {
 export function useReveal<T extends HTMLElement>() {
   return useCallback((el: T | null) => {
     if (!el) return
-    if (!('IntersectionObserver' in window)) {
-      el.classList.add('is-shown')
-      return
-    }
+    // Already on screen (or no observer support): leave it visible, never animate it in.
+    if (!('IntersectionObserver' in window) || el.getBoundingClientRect().top < window.innerHeight * 0.92) return
+    el.classList.add('is-pending')
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -54,23 +53,48 @@ export function useInView<T extends HTMLElement>() {
   return [ref, inView] as const
 }
 
-/** useState that is persisted to localStorage. */
+/**
+ * True once the page has hydrated in the browser; false in prerendered HTML and during
+ * hydration itself. Use it for values only the browser knows (URL query, storage).
+ */
+const noop = () => () => {}
+export function useHydrated() {
+  return useSyncExternalStore(noop, () => true, () => false)
+}
+
+const STORAGE_EVENT = 'syscomply:storage'
+
+/**
+ * State persisted to localStorage. Prerendered HTML and the hydration pass use `initial`,
+ * then the stored value takes over, so server and client markup always match.
+ */
 export function useStoredState<T extends string>(key: string, initial: T) {
-  const [value, setValue] = useState<T>(() => {
-    try {
-      return (localStorage.getItem(key) as T | null) ?? initial
-    } catch {
-      return initial
-    }
-  })
+  const value = useSyncExternalStore(
+    (cb) => {
+      window.addEventListener(STORAGE_EVENT, cb)
+      window.addEventListener('storage', cb)
+      return () => {
+        window.removeEventListener(STORAGE_EVENT, cb)
+        window.removeEventListener('storage', cb)
+      }
+    },
+    () => {
+      try {
+        return (localStorage.getItem(key) as T | null) ?? initial
+      } catch {
+        return initial
+      }
+    },
+    () => initial,
+  )
   const set = useCallback(
     (v: T) => {
-      setValue(v)
       try {
         localStorage.setItem(key, v)
       } catch {
-        /* storage unavailable (private mode); keep in memory only */
+        /* storage unavailable (private mode) */
       }
+      window.dispatchEvent(new Event(STORAGE_EVENT))
     },
     [key],
   )

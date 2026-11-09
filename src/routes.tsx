@@ -1,13 +1,14 @@
-import { createBrowserRouter } from 'react-router'
+import type { RouteObject } from 'react-router'
 import { Layout } from './components/Layout'
+import { industries } from './content/industries'
 import { Home } from './pages/Home'
 import { NotFound } from './pages/NotFound'
 
 /*
- * Home and 404 ship in the main bundle. Every other page is code-split and loaded on
- * first visit; the router waits for the chunk, so there is no loading flash.
+ * Shared by the browser (main.tsx) and the build-time prerender (entry-server.tsx).
+ * Home and 404 ship in the main bundle; every other page is code-split.
  */
-export const router = createBrowserRouter([
+export const routes: RouteObject[] = [
   {
     Component: Layout,
     HydrateFallback: () => null,
@@ -23,4 +24,16 @@ export const router = createBrowserRouter([
       { path: '*', Component: NotFound },
     ],
   },
-])
+]
+
+/** Every URL that is prerendered to static HTML at build time. */
+export const staticPaths = [
+  '/',
+  '/platform',
+  '/solutions',
+  ...industries.map((i) => `/solutions/${i.id}`),
+  '/marketplace',
+  '/pricing',
+  '/about',
+  '/contact',
+]

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { CtaBand } from '../components/CtaBand'
-import { ButtonA, IconBadge, PageHeader, Section, SectionHeading, TextLink, stack } from '../components/ui'
+import { ButtonA, IconBadge, PageHeader, Rail, Section, SectionHeading, TextLink, stack } from '../components/ui'
 import { SIGNUP_URL } from '../config'
 import { marketplace, roadmap } from '../content/company'
 
@@ -58,18 +58,20 @@ export function Marketplace() {
           />
           <TextLink to="/contact?topic=partnership">Partner with us</TextLink>
         </div>
-        <ul data-stagger className={`${stack} grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3`}>
-          {roadmap.map((r) => (
-            <li key={r.title} className="rounded-3xl bg-paper p-8">
-              <IconBadge icon={r.icon} />
-              <h3 className="mt-10 font-display text-xl">{r.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{r.body}</p>
-            </li>
-          ))}
-          <li className="flex items-end rounded-3xl bg-ink p-8 text-paper">
-            <p className="font-display text-2xl leading-snug italic">"Building Africa's digital compliance infrastructure."</p>
-          </li>
-        </ul>
+        <Rail label="Coming soon" className={stack} item="w-[72%]">
+          {[
+            ...roadmap.map((r) => (
+              <div key={r.title} className="rounded-3xl bg-paper p-8">
+                <IconBadge icon={r.icon} />
+                <h3 className="mt-10 font-display text-xl">{r.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">{r.body}</p>
+              </div>
+            )),
+            <div key="quote" className="flex items-end rounded-3xl bg-ink p-8 text-paper">
+              <p className="font-display text-2xl leading-snug italic">"Building Africa's digital compliance infrastructure."</p>
+            </div>,
+          ]}
+        </Rail>
       </Section>
 
       <CtaBand />

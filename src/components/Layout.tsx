@@ -124,7 +124,7 @@ function Header() {
 
         <button
           type="button"
-          className="-mr-2 grid size-10 place-items-center rounded-full lg:hidden"
+          className="-mr-2.5 grid size-11 place-items-center rounded-full active:bg-ink/5 lg:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
           aria-label={open ? 'Close menu' : 'Open menu'}
@@ -136,7 +136,7 @@ function Header() {
 
       {open && (
         <nav id="mobile-nav" aria-label="Main" className="absolute inset-x-0 top-full h-[calc(100dvh-4rem)] animate-rise bg-paper lg:hidden">
-          <Container className="flex h-full flex-col pt-6 pb-10">
+          <Container className="flex h-full flex-col overflow-y-auto pt-4 pb-[max(2.5rem,env(safe-area-inset-bottom))]">
             <ul className="grid gap-1">
               {[...nav, { to: '/contact', label: 'Contact' }].map((n) => (
                 <li key={n.to}>
@@ -191,24 +191,27 @@ function Footer() {
   return (
     <footer className="bg-ink text-paper">
       <Container>
-        <div className="grid gap-14 pt-8 pb-16 md:pt-12 md:pb-20 lg:grid-cols-[1.2fr_2fr]">
+        <div className="grid gap-10 pt-6 pb-12 md:gap-14 md:pt-12 md:pb-20 lg:grid-cols-[1.2fr_2fr]">
           <div className="max-w-xs">
             <Logo tone="light" />
             <p className="mt-6 text-sm leading-relaxed text-paper/50">
               Every ISO management system, in one place. Made in Freetown, Sierra Leone.
             </p>
-            <a href={`mailto:${CONTACT_EMAIL}`} className="mt-6 inline-block text-sm text-paper/80 transition-colors hover:text-paper">
+            <a href={`mailto:${CONTACT_EMAIL}`} className="mt-3 inline-flex min-h-11 items-center text-sm text-paper/80 transition-colors hover:text-paper">
               {CONTACT_EMAIL}
             </a>
           </div>
-          <div className="grid grid-cols-2 gap-x-8 gap-y-12 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-3 md:gap-y-12">
             {cols.map((c) => (
               <div key={c.title}>
-                <h2 className="text-xs font-medium tracking-[0.16em] text-paper/40 uppercase">{c.title}</h2>
-                <ul className="mt-5 grid gap-3">
+                <h2 className="text-xs font-medium tracking-[0.16em] text-paper/55 uppercase">{c.title}</h2>
+                <ul className="mt-3 grid md:mt-5 md:gap-3">
                   {c.links.map((l) => (
                     <li key={l.to}>
-                      <Link to={l.to} className="text-sm text-paper/70 transition-colors hover:text-paper">
+                      <Link
+                        to={l.to}
+                        className="flex min-h-11 items-center text-sm text-paper/70 transition-colors hover:text-paper md:inline md:min-h-0"
+                      >
                         {l.label}
                       </Link>
                     </li>
@@ -219,10 +222,10 @@ function Footer() {
           </div>
         </div>
 
-        <div className="grid gap-6 pb-10 text-xs leading-relaxed text-paper/35 md:pb-12">
+        <div className="grid gap-6 pb-10 text-xs leading-relaxed text-paper/55 md:pb-12">
           <p className="max-w-3xl">{isoDisclaimer}</p>
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <p className="flex items-center gap-6">
+            <p className="flex flex-wrap items-center gap-x-6 gap-y-2">
               <span>© {YEAR} SysComply.ai</span>
               <span className="inline-flex items-center gap-2">
                 <span className="size-1.5 rounded-full bg-sage" aria-hidden="true" />
@@ -232,7 +235,7 @@ function Footer() {
             <button
               type="button"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="inline-flex items-center gap-2 text-paper/50 transition-colors hover:text-paper"
+              className="-my-3 inline-flex min-h-11 items-center gap-2 text-paper/55 transition-colors hover:text-paper"
             >
               Back to top <ArrowUp className="size-3.5" strokeWidth={1.5} aria-hidden="true" />
             </button>

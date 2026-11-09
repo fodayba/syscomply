@@ -6,15 +6,21 @@ import { Button, Container, Eyebrow, IconBadge } from '../components/ui'
 import { CONTACT_EMAIL } from '../config'
 import { contactTopics } from '../content/company'
 import { sendContact } from '../lib/api'
+import { useHydrated } from '../lib/hooks'
 
 const templateFor = (topic: string) => contactTopics.find((t) => t.value === topic)?.message ?? ''
 
 export function Contact() {
   const [params] = useSearchParams()
-  const initialTopic = contactTopics.some((t) => t.value === params.get('topic')) ? params.get('topic')! : ''
+  const hydrated = useHydrated()
+  const queryTopic = contactTopics.some((t) => t.value === params.get('topic')) ? params.get('topic')! : ''
 
-  const [topic, setTopic] = useState(initialTopic)
-  const [message, setMessage] = useState(templateFor(initialTopic))
+  // The prerendered page can't know ?topic=, so it applies once the page is live.
+  // After the visitor picks a topic or types, their choice wins.
+  const [chosenTopic, setTopic] = useState<string | null>(null)
+  const [typed, setMessage] = useState<string | null>(null)
+  const topic = chosenTopic ?? (hydrated ? queryTopic : '')
+  const message = typed ?? templateFor(topic)
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [copied, setCopied] = useState(false)
 
@@ -31,7 +37,7 @@ export function Contact() {
   function changeTopic(next: string) {
     // Only swap in the new template if the visitor hasn't written their own message.
     const untouched = message.trim() === '' || contactTopics.some((t) => t.message === message)
-    if (untouched) setMessage(templateFor(next))
+    if (untouched) setMessage(null)
     setTopic(next)
   }
 
@@ -55,19 +61,19 @@ export function Contact() {
   }
 
   return (
-    <section className="pt-20 pb-24 md:pt-32 md:pb-32">
+    <section className="pt-14 pb-20 md:pt-32 md:pb-32">
       <title>Contact — SysComply</title>
-      <Container className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
+      <Container className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
         <div className="animate-rise">
           <Eyebrow>Contact</Eyebrow>
-          <h1 className="mt-8 font-display text-[2.75rem] leading-[1.04] font-normal tracking-[-0.025em] text-balance md:text-[4.25rem]">
+          <h1 className="mt-6 font-display text-[2.6rem] leading-[1.04] md:mt-8 font-normal tracking-[-0.025em] text-balance md:text-[4.25rem]">
             Let's talk about your <em>compliance journey.</em>
           </h1>
           <p className="mt-8 max-w-md text-lg leading-relaxed text-muted">
             Whether it's a question about SysComply, an enterprise setup or a consulting partnership, we usually reply
             within 24 hours.
           </p>
-          <dl className="mt-14 grid gap-8">
+          <dl className="mt-10 grid gap-6 md:mt-14 md:gap-8">
             <div className="flex gap-5">
               <IconBadge icon={Mail} />
               <div>
@@ -79,7 +85,7 @@ export function Contact() {
                   <button
                     type="button"
                     onClick={copyEmail}
-                    className="inline-flex items-center gap-1.5 text-sm transition-colors hover:text-ink"
+                    className="-my-3 inline-flex min-h-11 items-center gap-1.5 px-1 text-sm transition-colors hover:text-ink"
                   >
                     {copied ? <Check className="size-3.5" strokeWidth={1.5} /> : <Copy className="size-3.5" strokeWidth={1.5} />}
                     <span aria-live="polite">{copied ? 'Copied' : 'Copy'}</span>
@@ -97,7 +103,7 @@ export function Contact() {
           </dl>
         </div>
 
-        <div className="rounded-[28px] bg-white/70 p-7 shadow-[0_30px_60px_-40px_rgb(20_22_20/0.3)] md:p-10">
+        <div className="-mx-2 rounded-[28px] bg-white/70 p-6 shadow-[0_30px_60px_-40px_rgb(20_22_20/0.3)] sm:mx-0 md:p-10">
           {status === 'sent' ? (
             <FormSuccess title="Message sent">Our team will get back to you within 24 hours.</FormSuccess>
           ) : (

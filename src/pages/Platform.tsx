@@ -1,10 +1,10 @@
-import { useDeferredValue, useEffect, useMemo, useState } from 'react'
-import { ArrowDown, Search, X } from 'lucide-react'
+import { useDeferredValue, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import { ArrowDown, ChevronDown, Search, X } from 'lucide-react'
 import dashboardLight from '../assets/dashboard-light.webp'
 import dashboardLightSm from '../assets/dashboard-light-960.webp'
 import { CtaBand } from '../components/CtaBand'
 import { useOpenDemo } from '../components/demo-context'
-import { useTabs } from '../components/Tabs'
+import { chip, chipRow, useTabs } from '../components/Tabs'
 import {
   Button,
   ButtonA,
@@ -113,7 +113,7 @@ function Modules() {
             Seven domains, <em>one record.</em>
           </>
         }
-        lead="Search for a module, or move through the domains on the left."
+        lead="Search for a module, or browse the seven domains."
       />
       <div className={`${stack} grid gap-10 lg:grid-cols-[16rem_1fr] lg:gap-16`}>
         <div className="lg:sticky lg:top-28 lg:self-start">
@@ -137,7 +137,7 @@ function Modules() {
                 type="button"
                 onClick={() => setQuery('')}
                 aria-label="Clear search"
-                className="absolute top-1/2 right-2 grid size-8 -translate-y-1/2 place-items-center rounded-full text-muted hover:text-ink"
+                className="absolute top-1/2 right-0.5 grid size-11 -translate-y-1/2 place-items-center rounded-full text-muted hover:text-ink"
               >
                 <X className="size-4" strokeWidth={1.5} />
               </button>
@@ -175,36 +175,66 @@ function Modules() {
               <p className="mt-2 text-muted">Try a broader term, such as "audit" or "risk".</p>
             </div>
           )}
-          {filtered.map((d) => {
-            const n = domains.findIndex((x) => x.id === d.id) + 1
-            return (
-              <article
-                key={d.id}
-                id={d.id}
-                className="grid scroll-mt-28 gap-8 rounded-3xl bg-stone p-8 md:grid-cols-[1fr_1.1fr] md:gap-10 md:p-10"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-6">
-                    <Num n={n} />
-                    <IconBadge icon={d.icon} />
-                  </div>
-                  <h3 className="mt-6 font-display text-[1.75rem] leading-tight tracking-[-0.01em]">{d.title}</h3>
-                  <p className="mt-3 leading-relaxed text-muted">{d.summary}</p>
-                </div>
-                <ul className="grid content-start gap-3 md:pt-1">
-                  {d.modules.map((m) => (
-                    <li key={m} className="flex gap-3 text-[15px]">
-                      <Tick />
-                      <Highlight text={m} query={q} />
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            )
-          })}
+          {filtered.map((d) => (
+            <DomainCard key={d.id} domain={d} n={domains.findIndex((x) => x.id === d.id) + 1} query={q} />
+          ))}
         </div>
       </div>
     </Section>
+  )
+}
+
+const subscribeHash = (cb: () => void) => {
+  window.addEventListener('hashchange', cb)
+  return () => window.removeEventListener('hashchange', cb)
+}
+
+/**
+ * One domain. On phones the module list folds away behind a "Show modules" control so the
+ * page reads as seven short cards; searching, or arriving via a link to the domain, opens it.
+ * From `md` up the list is always visible and the control is hidden.
+ */
+function DomainCard({ domain: d, n, query }: { domain: (typeof domains)[number]; n: number; query: string }) {
+  const [open, setOpen] = useState(false)
+  const hash = useSyncExternalStore(subscribeHash, () => window.location.hash, () => '')
+  const listId = `${d.id}-modules`
+  const shown = open || query !== '' || hash === `#${d.id}`
+
+  return (
+    <article id={d.id} className="grid scroll-mt-28 gap-6 rounded-3xl bg-stone p-7 md:grid-cols-[1fr_1.1fr] md:gap-10 md:p-10">
+      <div>
+        <div className="flex items-center justify-between gap-6">
+          <Num n={n} />
+          <IconBadge icon={d.icon} />
+        </div>
+        <h3 className="mt-5 font-display text-[1.75rem] leading-tight tracking-[-0.01em] md:mt-6">{d.title}</h3>
+        <p className="mt-3 leading-relaxed text-muted">{d.summary}</p>
+      </div>
+      <ul id={listId} className={`${shown ? 'grid' : 'hidden'} content-start gap-3 md:grid md:pt-1`}>
+        {d.modules.map((m) => (
+          <li key={m} className="flex gap-3 text-[15px]">
+            <Tick />
+            <Highlight text={m} query={query} />
+          </li>
+        ))}
+      </ul>
+      {!query && (
+        <button
+          type="button"
+          aria-expanded={shown}
+          aria-controls={listId}
+          onClick={() => setOpen((o) => !o)}
+          className="-mx-2 -mt-2 flex min-h-11 items-center justify-between rounded-xl px-2 text-[15px] font-medium active:bg-ink/5 md:hidden"
+        >
+          {shown ? 'Hide modules' : `Show ${d.modules.length} modules`}
+          <ChevronDown
+            className={`size-4 text-muted transition-transform duration-300 ${shown ? 'rotate-180' : ''}`}
+            strokeWidth={1.5}
+            aria-hidden="true"
+          />
+        </button>
+      )}
+    </article>
   )
 }
 
@@ -240,10 +270,10 @@ function Ecosystem() {
           return (
             <li key={e.label} className="relative flex flex-col">
               <div
-                className={`flex h-full flex-col rounded-3xl p-7 lg:min-h-56 ${core ? 'bg-ink text-paper' : 'bg-paper'}`}
+                className={`flex h-full flex-col rounded-3xl p-6 md:p-7 lg:min-h-56 ${core ? 'bg-ink text-paper' : 'bg-paper'}`}
               >
                 <Num n={i + 1} light={core} />
-                <p className="mt-auto pt-10 font-display text-xl leading-snug">{e.label}</p>
+                <p className="mt-auto pt-6 font-display text-xl leading-snug lg:pt-10">{e.label}</p>
                 <p className={`mt-2 text-sm leading-relaxed ${core ? 'text-paper/55' : 'text-muted'}`}>{e.note}</p>
               </div>
               {!last && (
@@ -287,7 +317,7 @@ function FoodSuite() {
           <div
             role="tablist"
             aria-label="ISO 22000 modules"
-            className="-mx-6 flex gap-2 overflow-x-auto px-6 pb-1 [scrollbar-width:none] lg:mx-0 lg:grid lg:content-start lg:gap-1 lg:overflow-visible lg:px-0 lg:pb-0"
+            className={chipRow}
           >
             {foodSuite.map((x, i) => {
               const on = x.title === active
@@ -295,7 +325,7 @@ function FoodSuite() {
                 <button
                   key={x.title}
                   {...tabProps(x.title, i)}
-                  className={`flex shrink-0 items-center gap-3 rounded-full px-4 py-2.5 text-sm whitespace-nowrap transition-colors duration-300 lg:rounded-2xl lg:px-5 lg:py-3.5 lg:text-[15px] ${
+                  className={`${chip} flex items-center gap-3 transition-colors duration-300 ${
                     on
                       ? 'bg-paper text-ink'
                       : 'bg-ink-2 text-paper/60 hover:text-paper lg:bg-transparent lg:hover:bg-ink-2'
@@ -312,7 +342,7 @@ function FoodSuite() {
           </ButtonA>
         </div>
 
-        <div {...panelProps(active)} className="rounded-3xl bg-ink-2 p-8 outline-none md:p-12">
+        <div {...panelProps(active)} className="rounded-3xl bg-ink-2 p-7 outline-none md:p-12">
           <div key={active} className="grid animate-rise gap-10 md:grid-cols-[1.4fr_1fr] md:gap-12">
             <div>
               <IconBadge icon={m.icon} light />
@@ -327,7 +357,7 @@ function FoodSuite() {
               </ul>
             </div>
             <div className="self-end rounded-2xl bg-ink p-6">
-              <p className="flex items-center gap-2 text-[11px] tracking-[0.14em] text-paper/40 uppercase">
+              <p className="flex items-center gap-2 text-xs tracking-[0.14em] text-paper/55 uppercase">
                 <span className="size-1.5 rounded-full bg-sage" aria-hidden="true" />
                 {m.stat.label}
               </p>

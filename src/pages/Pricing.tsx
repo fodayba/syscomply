@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react'
 import { CtaBand } from '../components/CtaBand'
-import { ButtonA, ButtonLink, IconBadge, PageHeader, Section, SectionHeading, TextLink, Tick, stack } from '../components/ui'
+import { ButtonA, ButtonLink, IconBadge, PageHeader, Rail, Section, SectionHeading, TextLink, Tick, stack } from '../components/ui'
 import { SIGNUP_URL } from '../config'
 import { addOns, included } from '../content/pricing'
 import { standardsLabel, usePricing } from '../lib/usePricing'
@@ -32,7 +32,7 @@ export function Pricing() {
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="h-10 max-w-60 appearance-none rounded-full bg-stone pr-10 pl-4 text-sm font-medium focus:outline-1 focus:outline-ink"
+                className="h-11 max-w-60 appearance-none rounded-full bg-stone pr-10 pl-4 text-sm font-medium focus:outline-1 focus:outline-ink"
               >
                 {currencies.map((c) => (
                   <option key={c.code} value={c.code}>
@@ -45,16 +45,16 @@ export function Pricing() {
           </label>
         </div>
 
-        <div data-stagger className="grid gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4">
+        <Rail label="Plans" cols="md:grid-cols-2 xl:grid-cols-4" item="w-[86%]">
           {plans.map((p) => {
             const dark = p.featured
             const enterprise = p.priceUsd === null
             return (
-              <article key={p.tier} className={`flex flex-col rounded-3xl p-8 ${dark ? 'bg-ink text-paper' : 'bg-stone'}`}>
+              <article key={p.tier} className={`flex flex-col rounded-3xl p-7 md:p-8 ${dark ? 'bg-ink text-paper' : 'bg-stone'}`}>
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="font-display text-2xl">{p.name}</h2>
                   {p.featured && (
-                    <span className="rounded-full bg-paper/10 px-3 py-1 text-[11px] font-medium tracking-[0.12em] text-paper/80 uppercase">
+                    <span className="rounded-full bg-paper/10 px-3 py-1 text-xs font-medium tracking-[0.12em] text-paper/80 uppercase">
                       Most popular
                     </span>
                   )}
@@ -92,9 +92,10 @@ export function Pricing() {
               </article>
             )
           })}
-        </div>
+        </Rail>
+        <p className="mt-4 text-center text-sm text-muted md:hidden">Swipe to compare all four plans</p>
 
-        <div className="mt-4 flex flex-col gap-4 rounded-3xl bg-stone px-8 py-6 text-sm md:mt-6 md:flex-row md:items-center md:gap-12">
+        <div className="mt-6 flex flex-col gap-3 rounded-3xl bg-stone px-7 py-6 text-sm md:flex-row md:items-center md:gap-12 md:px-8">
           <span className="text-xs font-medium tracking-[0.16em] text-muted uppercase">Add-ons</span>
           {addOns.map((a) => (
             <span key={a.label}>
